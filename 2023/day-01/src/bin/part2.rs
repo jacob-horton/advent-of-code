@@ -90,6 +90,30 @@ mod tests {
     }
 
     #[test]
+    fn overlapping_word_numbers() {
+        let input = "afiveighttwo565twonea";
+        let result = process(input);
+
+        assert_eq!(result, 51)
+    }
+
+    #[test]
+    fn two_of_same_digit() {
+        let input = "afivetwo565asdf6";
+        let result = process(input);
+
+        assert_eq!(result, 56)
+    }
+
+    #[test]
+    fn two_of_same_word_number() {
+        let input = "a1two56two";
+        let result = process(input);
+
+        assert_eq!(result, 12)
+    }
+
+    #[test]
     fn real_input() {
         let input = include_str!("../inputs/input.txt");
         let result = process(input);
