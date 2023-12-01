@@ -87,7 +87,6 @@ mod tests {
         let result = process(input);
 
         assert_eq!(result, 281)
-        // assert_eq!(result, 281 + 28)
     }
 
     #[test]
@@ -96,6 +95,5 @@ mod tests {
         let result = process(input);
 
         assert_eq!(result, 54980)
-        // assert_eq!(result, 281 + 28)
     }
 }
