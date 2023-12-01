@@ -14,7 +14,7 @@ fn process(input: &str) -> u32 {
             }
 
             let first = line.chars().find(|c: &char| c.is_numeric()).unwrap();
-            let last = line.chars().rev().find(|c: &char| c.is_numeric()).unwrap();
+            let last = line.chars().rfind(|c: &char| c.is_numeric()).unwrap();
 
             format!("{first}{last}").parse::<u32>().unwrap()
         })
