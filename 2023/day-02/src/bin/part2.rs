@@ -1,3 +1,5 @@
+use day_02::{parse_input, Subset};
+
 fn main() {
     let input = include_str!("../inputs/input.txt");
     let result = process(input);
@@ -5,41 +7,20 @@ fn main() {
 }
 
 fn process(input: &str) -> u32 {
-    let mut sum = 0;
+    let games = parse_input(input);
 
-    for line in input.split('\n') {
-        if line.trim().is_empty() {
-            continue;
-        }
+    games
+        .into_iter()
+        .map(|game| {
+            let max = game
+                .subsets
+                .into_iter()
+                .reduce(|acc, s| Subset::piecewise_max(acc, s))
+                .unwrap();
 
-        let (_, rest) = line.split_once(": ").expect("No colon found in line");
-        let subsets = rest.split("; ");
-
-        let mut max_red = 0;
-        let mut max_blue = 0;
-        let mut max_green = 0;
-
-        for subset in subsets {
-            for colour_collection in subset.split(", ") {
-                let (num, colour) = colour_collection
-                    .split_once(" ")
-                    .expect("No space found between number and colour");
-
-                let num = num.parse::<u32>().expect("Not a number");
-                match colour {
-                    "red" => max_red = u32::max(max_red, num),
-                    "green" => max_green = u32::max(max_green, num),
-                    "blue" => max_blue = u32::max(max_blue, num),
-                    _ => panic!("Unexpected colour"),
-                };
-            }
-        }
-
-        let power = max_red * max_green * max_blue;
-        sum += power;
-    }
-
-    sum
+            max.red * max.green * max.blue
+        })
+        .sum()
 }
 
 #[cfg(test)]
@@ -52,5 +33,13 @@ pub mod tests {
         let result = process(input);
 
         assert_eq!(result, 2286);
+    }
+
+    #[test]
+    pub fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+
+        assert_eq!(result, 67335);
     }
 }
