@@ -15,9 +15,32 @@ fn get_number(matrix: &Vec<Vec<char>>, pos: &(usize, usize)) -> u32 {
         end += 1;
     }
 
-    let number_str = &matrix[pos.1][start..=end];
-    let number_string: String = number_str.to_owned().into_iter().collect();
+    let number_string = String::from_iter(&matrix[pos.1][start..=end]);
     number_string.parse().unwrap()
+}
+
+fn get_unique_adjacent_number_positions(
+    matrix: &Vec<Vec<char>>,
+    symbol_pos: &(usize, usize),
+) -> Vec<(usize, usize)> {
+    let mut unique_adjacent_number_positions = Vec::new();
+
+    for j in symbol_pos.1.saturating_sub(1)..=usize::min(matrix.len() - 1, symbol_pos.1 + 1) {
+        let mut prev_numeric = false;
+        for i in symbol_pos.0.saturating_sub(1)..=usize::min(matrix[j].len() - 1, symbol_pos.0 + 1)
+        {
+            if matrix[j][i].is_numeric() {
+                if !prev_numeric {
+                    unique_adjacent_number_positions.push((i, j));
+                }
+                prev_numeric = true;
+            } else {
+                prev_numeric = false;
+            }
+        }
+    }
+
+    unique_adjacent_number_positions
 }
 
 fn process(input: &str) -> u32 {
@@ -29,21 +52,8 @@ fn process(input: &str) -> u32 {
     for (y, line) in matrix.iter().enumerate() {
         for (x, char) in line.iter().enumerate() {
             if char == &'*' {
-                let mut unique_adjacent_number_positions = Vec::new();
-
-                for j in y.saturating_sub(1)..=usize::min(matrix.len() - 1, y + 1) {
-                    let mut prev_numeric = false;
-                    for i in x.saturating_sub(1)..=usize::min(line.len() - 1, x + 1) {
-                        if matrix[j][i].is_numeric() {
-                            if !prev_numeric {
-                                unique_adjacent_number_positions.push((i, j));
-                            }
-                            prev_numeric = true;
-                        } else {
-                            prev_numeric = false;
-                        }
-                    }
-                }
+                let unique_adjacent_number_positions =
+                    get_unique_adjacent_number_positions(&matrix, &(x, y));
 
                 if unique_adjacent_number_positions.len() != 2 {
                     continue;
