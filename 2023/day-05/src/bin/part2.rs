@@ -1,17 +1,10 @@
-use day_05::{parse_input_to_key, Mapping, MappingLine};
+use day_05::{parse_input, Mapping};
+use itertools::Itertools;
 
 fn main() {
     let input = include_str!("../inputs/input.txt");
     let result = process(input);
     println!("{result}");
-}
-
-// Mapping = from humidity, to location
-fn get_sorted_location_ranges(locations: &Mapping) -> Vec<MappingLine> {
-    let mut sorted_mappings = locations.mappings.clone();
-    sorted_mappings.sort_by(|m1, m2| m1.dest_start.cmp(&m2.dest_start));
-
-    sorted_mappings
 }
 
 fn seed_exists(seeds: &Vec<u64>, seed: u64) -> bool {
@@ -27,26 +20,57 @@ fn seed_exists(seeds: &Vec<u64>, seed: u64) -> bool {
     false
 }
 
+// Get boundaries from each range in the location "realm"
+fn get_intersection_points(mappings: &Vec<Mapping>) -> Vec<u64> {
+    let mut intersection_points = Vec::new();
+
+    // Loop through each mapping, collecting the end points of each range
+    for mapping in mappings {
+        // Add source end points to intersection points
+        intersection_points.append(
+            &mut mapping
+                .mappings
+                .iter()
+                .map(|m| [m.source_start, m.source_start + m.range_length])
+                .flatten()
+                .collect_vec(),
+        );
+
+        // Map intersections to next "realm"
+        intersection_points = intersection_points
+            .into_iter()
+            .map(|i| mapping.map_value(i))
+            .collect_vec();
+    }
+
+    // Order them and get unique values
+    intersection_points.sort();
+    intersection_points.into_iter().unique().collect_vec()
+}
+
 fn process(input: &str) -> u64 {
-    let (seeds, mappings) = parse_input_to_key(input);
+    let (seeds, mappings) = parse_input(input);
 
-    let mut i = 0;
-    loop {
+    // Get the intersection points which define the boundaries of mapping ranges.
+    // We know that the lowest location will be at the start of one of these boundaries
+    // as within the boundaries, it will only increase as you increase the input
+    let intersection_points = get_intersection_points(&mappings);
+
+    // Work back from location to seed to find the first location point
+    // that has a corresponding seed
+    for i in intersection_points {
         let mut v = i;
-        let mut to = "location";
 
-        while to != "seed" {
-            let mapping = mappings.get(to).unwrap();
+        for mapping in mappings.iter().rev() {
             v = mapping.reverse_map_value(v);
-            to = mapping.from;
         }
 
         if seed_exists(&seeds, v) {
             return i;
         }
-
-        i += 1;
     }
+
+    panic!("Not found");
 }
 
 #[cfg(test)]

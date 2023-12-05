@@ -1,4 +1,4 @@
-use day_05::parse_input_from_key;
+use day_05::parse_input;
 
 fn main() {
     let input = include_str!("../inputs/input.txt");
@@ -7,15 +7,11 @@ fn main() {
 }
 
 fn process(input: &str) -> u64 {
-    let (seeds, mappings) = parse_input_from_key(input);
-    let mut from = "seed";
+    let (seeds, mappings) = parse_input(input);
 
     let mut values = seeds;
-    while from != "location" {
-        let mapping = mappings.get(from).unwrap();
-
+    for mapping in mappings {
         values = values.iter().map(|v| mapping.map_value(*v)).collect();
-        from = mapping.to;
     }
 
     values.into_iter().min().unwrap()

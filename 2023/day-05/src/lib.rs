@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use nom::{
     bytes::complete::tag,
     character::complete::{self, alpha1, newline},
@@ -80,30 +78,10 @@ fn parse_mapping(input: &str) -> IResult<&str, Mapping> {
     Ok((input, Mapping { from, to, mappings }))
 }
 
-// From is key of HashMap
-pub fn parse_input_from_key(input: &str) -> (Vec<u64>, HashMap<&str, Mapping>) {
+pub fn parse_input(input: &str) -> (Vec<u64>, Vec<Mapping>) {
     let (input, seeds) = parse_seeds(input).unwrap();
     let (_, mappings) =
         preceded(tag("\n\n"), separated_list0(tag("\n\n"), parse_mapping))(input).unwrap();
 
-    let mut mappings_map = HashMap::new();
-    for mapping in mappings {
-        mappings_map.insert(mapping.from, mapping);
-    }
-
-    (seeds, mappings_map)
-}
-
-// To is key of HashMap
-pub fn parse_input_to_key(input: &str) -> (Vec<u64>, HashMap<&str, Mapping>) {
-    let (input, seeds) = parse_seeds(input).unwrap();
-    let (_, mappings) =
-        preceded(tag("\n\n"), separated_list0(tag("\n\n"), parse_mapping))(input).unwrap();
-
-    let mut mappings_map = HashMap::new();
-    for mapping in mappings {
-        mappings_map.insert(mapping.to, mapping);
-    }
-
-    (seeds, mappings_map)
+    (seeds, mappings)
 }
