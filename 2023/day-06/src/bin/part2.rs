@@ -43,16 +43,24 @@ fn process(input: &str) -> u64 {
     let time = parse_line(time_line);
     let distance = parse_line(distance_line);
 
-    // #  = Slower
-    // @  = Faster
+    // Time = 8ms
+    // Distance = 10
+    //
+    // #  = Not further
+    // @  = Further
     // \d = Time holding
     //
     // 012345678
     // ##@@@@@##
     //
-    // Symmetrical, so if we know the first point at which the time is faster,
-    // we know the last point at which it is faster (time - first_faster). Then
-    // we can do a subtraction to find the number of different times inbetween
+    // first_further = 2
+    // last_further = (8 - first_further) = 6
+    // (6 - 2) + 1 = 5
+    //
+    // Symmetrical, so if we know the first hold_time at which we go further,
+    // we know the last point at which we go further (time - first_further).
+    // Then we can do a subtraction to find the number of different times
+    // in-between. And off by one as we need to include the last hold_time
     let first_further = find_first_further(time, distance);
     (time - first_further) - first_further + 1
 }
