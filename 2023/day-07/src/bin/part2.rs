@@ -31,6 +31,13 @@ pub mod tests {
     }
 
     #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 243101568);
+    }
+
+    #[test]
     fn test_joker() {
         let hand = Hand::new("32T3K".chars().collect(), true);
         assert_eq!(hand.get_type(), HandType::OnePair);

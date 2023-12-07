@@ -56,46 +56,42 @@ impl Hand {
             false => 0,
         };
 
+        // If all jokers, then 5 of a kind
         if wildcards == 5 {
             return HandType::FiveOfAKind;
         }
 
-        let counts = get_counts(&self.cards);
-        let (char, highest_count) = counts
-            .iter()
-            .filter(|(c, _)| c != &'J')
-            .max_by(|(_, n1), (_, n2)| n1.cmp(n2))
-            .unwrap();
+        let mut counts = get_counts(&self.cards);
+        if self.jokers_as_wildcard {
+            // Remove jokers from counts
+            counts = counts.into_iter().filter(|(c, _)| c != &'J').collect();
+        }
 
+        // Get the card with the highest count
+        let (card, highest_count) = counts.iter().max_by(|(_, n1), (_, n2)| n1.cmp(n2)).unwrap();
+
+        // Add any wildcards to that count (wildcard will act as that card)
         match highest_count + wildcards {
             5 => HandType::FiveOfAKind,
             4 => HandType::FourOfAKind,
             3 => {
-                if counts
-                    .iter()
-                    .filter(|(c, n)| c != &'J' && c != char && n == &2)
-                    .count()
-                    == 1
-                {
+                // Check for a pair that isn't the same as the one found (if pair + joker)
+                if counts.iter().filter(|(c, n)| c != card && n == &2).count() == 1 {
                     HandType::FullHouse
                 } else {
                     HandType::ThreeOfAKind
                 }
             }
             2 => {
-                if counts
-                    .iter()
-                    .filter(|(c, n)| c != &'J' && c != char && n == &2)
-                    .count()
-                    == 1
-                {
+                // Check for a pair that isn't the same as the one found
+                if counts.iter().filter(|(c, n)| c != card && n == &2).count() == 1 {
                     HandType::TwoPair
                 } else {
                     HandType::OnePair
                 }
             }
             1 => HandType::HighCard,
-            _ => panic!("No cards in hand"),
+            _ => panic!("Invalid number of cards found"),
         }
     }
 }

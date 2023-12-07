@@ -4,6 +4,7 @@ pub mod hand_type;
 use crate::hand::Hand;
 use std::collections::HashMap;
 
+// Get the count of each kind of card
 pub fn get_counts(cards: &Vec<char>) -> Vec<(char, u32)> {
     let mut counts = HashMap::new();
 
@@ -15,6 +16,7 @@ pub fn get_counts(cards: &Vec<char>) -> Vec<(char, u32)> {
     counts.into_iter().collect()
 }
 
+// Returns Vec<(hand, bid)>
 pub fn parse_input(input: &str, jokers_as_wildcard: bool) -> Vec<(Hand, u32)> {
     input
         .split('\n')
