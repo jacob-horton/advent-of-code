@@ -16,14 +16,14 @@ pub struct Hand {
 
 impl Ord for Hand {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        let card_strengths = if self.jokers_as_wildcard {
-            &CARD_STRENGTHS_JOKER_WILDCARD
-        } else {
-            &CARD_STRENGTHS_BASIC
-        };
-
         match self.get_type().cmp(&other.get_type()) {
             std::cmp::Ordering::Equal => {
+                let card_strengths = if self.jokers_as_wildcard {
+                    &CARD_STRENGTHS_JOKER_WILDCARD
+                } else {
+                    &CARD_STRENGTHS_BASIC
+                };
+
                 // If type of hand matches, check individual cards
                 for (c1, c2) in self.cards.iter().zip(&other.cards) {
                     let c1_strength = card_strengths.iter().position(|c| c == c1).unwrap();

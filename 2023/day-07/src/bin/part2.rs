@@ -38,77 +38,45 @@ pub mod tests {
     }
 
     #[test]
-    fn test_joker() {
-        let hand = Hand::new("32T3K".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::OnePair);
+    fn test_hand_types() {
+        let mappings = [
+            ("32T1K", HandType::HighCard),
+            ("32T3K", HandType::OnePair),
+            ("QT32J", HandType::OnePair),
+            ("KK677", HandType::TwoPair),
+            ("AAA2Q", HandType::ThreeOfAKind),
+            ("JJA12", HandType::ThreeOfAKind),
+            ("QQAAJ", HandType::FullHouse),
+            ("AAA22", HandType::FullHouse),
+            ("T55J5", HandType::FourOfAKind),
+            ("KTJJT", HandType::FourOfAKind),
+            ("QQQAJ", HandType::FourOfAKind),
+            ("JJJJJ", HandType::FiveOfAKind),
+            ("JJJJQ", HandType::FiveOfAKind),
+            ("QQQQJ", HandType::FiveOfAKind),
+        ];
 
-        let hand = Hand::new("T55J5".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FourOfAKind);
-
-        let hand = Hand::new("KK677".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::TwoPair);
-
-        let hand = Hand::new("KTJJT".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FourOfAKind);
-
-        let hand = Hand::new("QQQJA".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FourOfAKind);
-
-        let hand = Hand::new("JJJJJ".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FiveOfAKind);
-
-        let hand = Hand::new("JJJJQ".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FiveOfAKind);
-
-        let hand = Hand::new("QQQQJ".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FiveOfAKind);
-
-        let hand = Hand::new("QQQAJ".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FourOfAKind);
-
-        let hand = Hand::new("QQAAJ".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FullHouse);
-
-        let hand = Hand::new("QT32J".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::OnePair);
-
-        let hand = Hand::new("AAA2Q".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::ThreeOfAKind);
-
-        let hand = Hand::new("AAA22".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FullHouse);
-
-        let hand = Hand::new("JAA22".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::FullHouse);
-
-        let hand = Hand::new("JJA12".chars().collect(), true);
-        assert_eq!(hand.get_type(), HandType::ThreeOfAKind);
+        for (cards, expected_type) in mappings {
+            let hand = Hand::new(cards.chars().collect(), true);
+            assert_eq!(hand.get_type(), expected_type);
+        }
     }
 
     #[test]
     fn test_joker_comparison() {
-        let hand = Hand::new("JJJJJ".chars().collect(), true);
-        let other = Hand::new("QQQQQ".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Less);
+        let mappings = [
+            ("JJJJJ", "QQQQQ", std::cmp::Ordering::Less),
+            ("JJJJJ", "JQQQQ", std::cmp::Ordering::Less),
+            ("JAAAA", "22222", std::cmp::Ordering::Less),
+            ("AAJJQ", "QAAJJ", std::cmp::Ordering::Greater),
+            ("AAJJQ", "QAAAA", std::cmp::Ordering::Greater),
+            ("AAAAJ", "22222", std::cmp::Ordering::Greater),
+        ];
 
-        let hand = Hand::new("JJJJJ".chars().collect(), true);
-        let other = Hand::new("JQQQQ".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Less);
-
-        let hand = Hand::new("AAJJQ".chars().collect(), true);
-        let other = Hand::new("QAAJJ".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Greater);
-
-        let hand = Hand::new("AAJJQ".chars().collect(), true);
-        let other = Hand::new("QAAAA".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Greater);
-
-        let hand = Hand::new("AAAAJ".chars().collect(), true);
-        let other = Hand::new("22222".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Greater);
-
-        let hand = Hand::new("JAAAA".chars().collect(), true);
-        let other = Hand::new("22222".chars().collect(), true);
-        assert_eq!(hand.cmp(&other), std::cmp::Ordering::Less);
+        for (cards1, cards2, expected_ordering) in mappings {
+            let hand1 = Hand::new(cards1.chars().collect(), true);
+            let hand2 = Hand::new(cards2.chars().collect(), true);
+            assert_eq!(hand1.cmp(&hand2), expected_ordering);
+        }
     }
 }
