@@ -20,8 +20,8 @@ fn process(input: &str) -> u32 {
 #[cfg(test)]
 pub mod tests {
     use super::*;
-    use day_07::Hand;
-    use day_07::HandType;
+    use day_07::hand::Hand;
+    use day_07::hand_type::HandType;
 
     #[test]
     fn test_input() {
