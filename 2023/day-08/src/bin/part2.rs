@@ -5,7 +5,7 @@ struct Node<'a> {
     right: &'a str,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 struct Loop {
     z_index: u64,
     length: u64,
@@ -37,40 +37,34 @@ fn process(input: &str) -> u64 {
         nodes.insert(node_name, Node { left, right });
     }
 
-    // TODO: vec instead of hashmap
-    // start_node_idx -> first_z_step
-    let mut first_z_steps = HashMap::new();
-    // start_node_idx -> loop
-    let mut loops = HashMap::new();
+    let mut first_z_steps = vec![None; starting_nodes.len()];
+    let mut loops = vec![None; starting_nodes.len()];
 
     // Note: this only works if whenever it reaches the same node, it will be on the same
     // instruction
     let mut steps = 0;
     let mut curr_node_names = starting_nodes;
     for instruction in instructions.chars().into_iter().cycle() {
-        if loops.len() == curr_node_names.len() {
+        if !loops.contains(&None) {
             break;
         }
 
         // Loop through each node
         for (i, curr_name) in curr_node_names.iter_mut().enumerate() {
-            if loops.contains_key(&i) {
+            if loops[i].is_some() {
                 continue;
             }
 
             if curr_name.ends_with('Z') {
-                match first_z_steps.get(&i) {
+                match first_z_steps[i] {
                     Some(first_z_step) => {
-                        loops.insert(
-                            i,
-                            Loop {
-                                z_index: *first_z_step,
-                                length: steps - *first_z_step,
-                            },
-                        );
+                        loops[i] = Some(Loop {
+                            z_index: first_z_step,
+                            length: steps - first_z_step,
+                        });
                     }
                     None => {
-                        first_z_steps.insert(i, steps);
+                        first_z_steps[i] = Some(steps);
                     }
                 }
             }
@@ -85,7 +79,7 @@ fn process(input: &str) -> u64 {
         steps += 1;
     }
 
-    find_common_multiple(&loops.into_values().collect())
+    find_common_multiple(&loops.into_iter().flatten().collect())
 }
 
 // TODO: optimise
@@ -162,7 +156,7 @@ pub mod tests {
 
     #[test]
     fn real_input() {
-        let input = include_str!("../inputs/test_part2.txt");
+        let input = include_str!("../inputs/input.txt");
         let result = process(input);
         assert_eq!(result, 9858474970153);
     }
