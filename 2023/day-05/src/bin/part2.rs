@@ -7,7 +7,7 @@ fn main() {
     println!("{result}");
 }
 
-fn seed_exists(seeds: &Vec<u64>, seed: u64) -> bool {
+fn seed_exists(seeds: &[u64], seed: u64) -> bool {
     for parts in seeds.chunks(2) {
         let start = parts[0];
         let len = parts[1];

@@ -4,7 +4,7 @@ fn main() {
     println!("{result}");
 }
 
-fn get_number(matrix: &Vec<Vec<char>>, pos: &(usize, usize)) -> u32 {
+fn get_number(matrix: &[Vec<char>], pos: &(usize, usize)) -> u32 {
     let mut start = pos.0;
     while start > 0 && matrix[pos.1][start - 1].is_numeric() {
         start -= 1;
@@ -25,11 +25,16 @@ fn get_unique_adjacent_number_positions(
 ) -> Vec<(usize, usize)> {
     let mut unique_adjacent_number_positions = Vec::new();
 
-    for j in symbol_pos.1.saturating_sub(1)..=usize::min(matrix.len() - 1, symbol_pos.1 + 1) {
+    let min_x = symbol_pos.0.saturating_sub(1);
+    let min_y = symbol_pos.1.saturating_sub(1);
+
+    let max_x = usize::min(matrix[0].len() - 1, symbol_pos.0 + 1);
+    let max_y = usize::min(matrix.len() - 1, symbol_pos.1 + 1);
+
+    for (j, row) in matrix.iter().enumerate().take(max_y + 1).skip(min_y) {
         let mut prev_numeric = false;
-        for i in symbol_pos.0.saturating_sub(1)..=usize::min(matrix[j].len() - 1, symbol_pos.0 + 1)
-        {
-            if matrix[j][i].is_numeric() {
+        for (i, val) in row.iter().enumerate().take(max_x + 1).skip(min_x) {
+            if val.is_numeric() {
                 if !prev_numeric {
                     unique_adjacent_number_positions.push((i, j));
                 }

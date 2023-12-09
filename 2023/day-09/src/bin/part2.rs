@@ -4,11 +4,11 @@ fn main() {
     println!("{result}");
 }
 
-fn find_derivative(sequence: &Vec<i32>) -> Vec<i32> {
+fn find_derivative(sequence: &[i32]) -> Vec<i32> {
     sequence.windows(2).map(|pair| pair[1] - pair[0]).collect()
 }
 
-fn prev_number(sequence: &Vec<i32>) -> i32 {
+fn prev_number(sequence: &[i32]) -> i32 {
     let mut derivatives: Vec<Vec<i32>> = vec![sequence.to_owned()];
     while derivatives.last().unwrap().iter().any(|x| x != &0) {
         derivatives.push(find_derivative(derivatives.last().unwrap()));
@@ -16,7 +16,7 @@ fn prev_number(sequence: &Vec<i32>) -> i32 {
 
     derivatives
         .into_iter()
-        .map(|d| d.first().unwrap().clone())
+        .map(|d| *d.first().unwrap())
         .rfold(0, |acc, v| v - acc)
 }
 
@@ -44,5 +44,12 @@ pub mod tests {
         let input = include_str!("../inputs/test_part2.txt");
         let result = process(input);
         assert_eq!(result, 2);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 803);
     }
 }

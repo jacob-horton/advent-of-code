@@ -18,26 +18,30 @@ fn process(input: &str) -> u32 {
             if char.is_numeric() {
                 buffer.push(*char);
 
-                for j in y.saturating_sub(1)..=usize::min(matrix.len() - 1, y + 1) {
-                    for i in x.saturating_sub(1)..=usize::min(line.len() - 1, x + 1) {
-                        if matrix[j][i] != '.' && !matrix[j][i].is_numeric() {
+                let min_x = x.saturating_sub(1);
+                let min_y = y.saturating_sub(1);
+
+                let max_x = usize::min(line.len() - 1, x + 1);
+                let max_y = usize::min(matrix.len() - 1, y + 1);
+
+                for row in matrix.iter().take(max_y + 1).skip(min_y) {
+                    for val in row.iter().take(max_x + 1).skip(min_x) {
+                        if val != &'.' && !val.is_numeric() {
                             symbol_adjacent = true;
                         }
                     }
                 }
-            } else {
-                if buffer.len() > 0 {
-                    if symbol_adjacent {
-                        sum += buffer.parse::<u32>().unwrap();
-                    }
-
-                    buffer.clear();
-                    symbol_adjacent = false;
+            } else if !buffer.is_empty() {
+                if symbol_adjacent {
+                    sum += buffer.parse::<u32>().unwrap();
                 }
+
+                buffer.clear();
+                symbol_adjacent = false;
             }
         }
 
-        if buffer.len() > 0 {
+        if !buffer.is_empty() {
             if symbol_adjacent {
                 sum += buffer.parse::<u32>().unwrap();
             }

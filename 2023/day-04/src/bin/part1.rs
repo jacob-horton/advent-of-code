@@ -18,7 +18,7 @@ fn process(input: &str) -> u32 {
         let mine: Vec<_> = mine.split(' ').filter(|n| !n.trim().is_empty()).collect();
         let mine_winning: Vec<_> = winning.split(' ').filter(|n| mine.contains(n)).collect();
 
-        if mine_winning.len() > 0 {
+        if !mine_winning.is_empty() {
             sum += 2u32.pow(mine_winning.len() as u32 - 1);
         }
     }
@@ -35,5 +35,12 @@ pub mod tests {
         let input = include_str!("../inputs/test_part1.txt");
         let result = process(input);
         assert_eq!(result, 13);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 15268);
     }
 }

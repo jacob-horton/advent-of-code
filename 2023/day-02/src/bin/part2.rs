@@ -15,7 +15,7 @@ fn process(input: &str) -> u32 {
             let max = game
                 .subsets
                 .into_iter()
-                .reduce(|acc, s| Subset::piecewise_max(acc, s))
+                .reduce(Subset::piecewise_max)
                 .unwrap();
 
             max.red * max.green * max.blue

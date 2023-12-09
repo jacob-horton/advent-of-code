@@ -24,8 +24,7 @@ pub struct Subset {
 
 impl Sum for Subset {
     fn sum<I: Iterator<Item = Self>>(iter: I) -> Self {
-        iter.reduce(|acc, s| Subset::piecewise_max(acc, s))
-            .unwrap_or(Subset::default())
+        iter.reduce(Subset::piecewise_max).unwrap_or_default()
     }
 }
 

@@ -12,7 +12,7 @@ fn parse_line(line: &str) -> u64 {
     line.split_once(':')
         .unwrap()
         .1
-        .replace(" ", "")
+        .replace(' ', "")
         .trim()
         .parse()
         .unwrap()

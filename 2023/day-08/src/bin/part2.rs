@@ -39,7 +39,7 @@ fn process(input: &str) -> u64 {
     // This is just an observation from the test and real data
     let mut steps = 0;
     let mut curr_node_names = starting_nodes;
-    for instruction in instructions.chars().into_iter().cycle() {
+    for instruction in instructions.chars().cycle() {
         if !first_z_steps.contains(&None) {
             break;
         }
@@ -66,7 +66,7 @@ fn process(input: &str) -> u64 {
         steps += 1;
     }
 
-    lcm(&first_z_steps.into_iter().flatten().collect())
+    lcm(&first_z_steps.into_iter().flatten().collect::<Vec<u64>>())
 }
 
 #[cfg(test)]

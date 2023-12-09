@@ -49,12 +49,10 @@ fn union_prime_factors(factors_list: &Vec<HashMap<u64, u32>>) -> HashMap<u64, u3
     union
 }
 
-pub fn lcm(nums: &Vec<u64>) -> u64 {
-    let primes = primes(*nums.into_iter().max().unwrap());
+pub fn lcm(nums: &[u64]) -> u64 {
+    let primes = primes(*nums.iter().max().unwrap());
     let prime_factors: Vec<_> = nums.iter().map(|n| prime_factors(*n, &primes)).collect();
 
     let union = union_prime_factors(&prime_factors);
-    let lcm = union.into_iter().map(|(p, n)| p * n as u64).product();
-
-    lcm
+    union.into_iter().map(|(p, n)| p * n as u64).product()
 }

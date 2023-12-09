@@ -9,8 +9,7 @@ fn distance_travelled(total_time: u32, time_holding: u32) -> u32 {
 }
 
 fn parse_line(line: &str) -> Vec<u32> {
-    line.trim()
-        .split_whitespace()
+    line.split_whitespace()
         .skip(1)
         .map(|x| x.parse().unwrap())
         .collect()
@@ -41,5 +40,12 @@ pub mod tests {
         let input = include_str!("../inputs/test_part1.txt");
         let result = process(input);
         assert_eq!(result, 288);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 449820);
     }
 }

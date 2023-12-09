@@ -8,10 +8,16 @@ const CARD_STRENGTHS_JOKER_WILDCARD: [char; 13] = [
     'J', '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'Q', 'K', 'A',
 ];
 
-#[derive(Debug, Clone, PartialEq, PartialOrd, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Hand {
     cards: Vec<char>,
     jokers_as_wildcard: bool,
+}
+
+impl PartialOrd for Hand {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Ord for Hand {
@@ -64,7 +70,7 @@ impl Hand {
         let mut counts = get_counts(&self.cards);
         if self.jokers_as_wildcard {
             // Remove jokers from counts
-            counts = counts.into_iter().filter(|(c, _)| c != &'J').collect();
+            counts.retain(|(c, _)| c != &'J');
         }
 
         // Get the card with the highest count

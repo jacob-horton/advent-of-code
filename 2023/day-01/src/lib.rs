@@ -1,8 +1,8 @@
-static WORD_NUMBERS: [&'static str; 9] = [
+static WORD_NUMBERS: [&str; 9] = [
     "one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
 ];
 
-static OVERLAPS: [(&'static str, &'static str); 7] = [
+static OVERLAPS: [(&str, &str); 7] = [
     ("oneight", "oneeight"),
     ("twone", "twoone"),
     ("threeight", "threeeight"),

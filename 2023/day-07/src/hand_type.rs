@@ -8,7 +8,7 @@ pub const HAND_TYPE_STRENGTHS: [HandType; 7] = [
     HandType::FiveOfAKind,
 ];
 
-#[derive(Debug, Clone, Eq, PartialEq, PartialOrd)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum HandType {
     FiveOfAKind,
     FourOfAKind,
@@ -17,6 +17,12 @@ pub enum HandType {
     TwoPair,
     OnePair,
     HighCard,
+}
+
+impl PartialOrd for HandType {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 impl Ord for HandType {

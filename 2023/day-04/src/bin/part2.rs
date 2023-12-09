@@ -24,10 +24,10 @@ fn process(input: &str) -> u32 {
         let mine: Vec<_> = mine.split(' ').filter(|n| !n.trim().is_empty()).collect();
         let mine_winning: Vec<_> = winning.split(' ').filter(|n| mine.contains(n)).collect();
 
-        let this_multiplier = multipliers.get(&card_no).unwrap_or(&1).clone();
+        let this_multiplier = *multipliers.get(&card_no).unwrap_or(&1);
         sum += this_multiplier; // Add the number of copies of this card that we have
 
-        if mine_winning.len() > 0 {
+        if !mine_winning.is_empty() {
             // Add extra cards to the ones after
             for i in card_no + 1..card_no + 1 + mine_winning.len() as u32 {
                 let entry = multipliers.entry(i).or_insert(1);
@@ -48,5 +48,12 @@ pub mod tests {
         let input = include_str!("../inputs/test_part2.txt");
         let result = process(input);
         assert_eq!(result, 30);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 6283755);
     }
 }

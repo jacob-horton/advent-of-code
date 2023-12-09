@@ -27,4 +27,11 @@ pub mod tests {
         let result = process(input);
         assert_eq!(result, 35);
     }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 178159714);
+    }
 }

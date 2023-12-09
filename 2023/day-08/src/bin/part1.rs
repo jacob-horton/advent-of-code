@@ -28,7 +28,7 @@ fn process(input: &str) -> u32 {
 
     let mut steps = 0;
     let mut curr_name = "AAA";
-    for instruction in instructions.chars().into_iter().cycle() {
+    for instruction in instructions.chars().cycle() {
         if curr_name == "ZZZ" {
             break;
         }
@@ -62,5 +62,12 @@ pub mod tests {
         let input = include_str!("../inputs/test2_part1.txt");
         let result = process(input);
         assert_eq!(result, 6);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 11567);
     }
 }
