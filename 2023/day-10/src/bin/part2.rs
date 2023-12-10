@@ -1,3 +1,5 @@
+use std::collections::HashSet;
+
 use day_10::{get_next, parse_input, DIRECTIONS};
 
 fn main() {
@@ -78,8 +80,9 @@ fn get_num_inside(pipes: &Vec<(u32, u32)>) -> u32 {
     // This is all the points that have an even x and y value
     let expanded = expand_pipes(pipes);
     let start = get_inside_point(&expanded);
+    let expanded_set: HashSet<(u32, u32)> = HashSet::from_iter(expanded);
 
-    let mut explored = vec![];
+    let mut explored = HashSet::new();
     let mut frontier = vec![start];
     while !frontier.is_empty() {
         let curr = frontier.pop().unwrap();
@@ -87,17 +90,12 @@ fn get_num_inside(pipes: &Vec<(u32, u32)>) -> u32 {
             continue;
         }
 
-        explored.push(curr);
+        explored.insert(curr);
 
         let next = DIRECTIONS
-            .map(|(dx, dy)| {
-                (
-                    (curr.0 as i32 + dx as i32) as u32,
-                    (curr.1 as i32 + dy as i32) as u32,
-                )
-            })
+            .map(|(dx, dy)| ((curr.0 as i32 + dx) as u32, (curr.1 as i32 + dy) as u32))
             .into_iter()
-            .filter(|pos| !expanded.contains(pos));
+            .filter(|pos| !expanded_set.contains(pos));
 
         frontier.append(&mut next.collect());
     }
@@ -151,5 +149,12 @@ pub mod tests {
         let input = include_str!("../inputs/test_part2_3.txt");
         let result = process(input);
         assert_eq!(result, 8);
+    }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 417);
     }
 }

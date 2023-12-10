@@ -1,10 +1,10 @@
-pub const DIRECTIONS: [(i8, i8); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
+pub const DIRECTIONS: [(i32, i32); 4] = [(0, 1), (1, 0), (0, -1), (-1, 0)];
 
 #[derive(Debug, Clone)]
 pub struct PipeDetails {
     // Tuples for relative offset of connected pip
-    pub entrance: (i8, i8),
-    pub exit: (i8, i8),
+    pub entrance: (i32, i32),
+    pub exit: (i32, i32),
 
     pub pos: (u32, u32),
     pub char: char,
@@ -88,7 +88,7 @@ pub fn get_next(prev: (u32, u32), curr: (u32, u32), grid: &Vec<Vec<Pipe>>) -> (u
     };
 
     for dir in directions {
-        let pos = (curr.0 as i32 + dir.0 as i32, curr.1 as i32 + dir.1 as i32);
+        let pos = (curr.0 as i32 + dir.0, curr.1 as i32 + dir.1);
         if pos.0 < 0 || pos.1 < 0 || pos.1 >= grid.len() as i32 || pos.0 >= grid[0].len() as i32 {
             continue;
         }

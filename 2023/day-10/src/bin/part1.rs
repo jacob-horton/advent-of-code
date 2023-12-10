@@ -50,4 +50,11 @@ pub mod tests {
         let result = process(input);
         assert_eq!(result, 8);
     }
+
+    #[test]
+    fn real_input() {
+        let input = include_str!("../inputs/input.txt");
+        let result = process(input);
+        assert_eq!(result, 7005);
+    }
 }
