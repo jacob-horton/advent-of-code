@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
-use day_10::{get_next, parse_input, DIRECTIONS};
+use day_10::{get_next, parse_input, Pipe};
+use itertools::Itertools;
 
 fn main() {
     let input = include_str!("../inputs/input.txt");
@@ -8,111 +9,61 @@ fn main() {
     println!("{result}");
 }
 
-// fn print_grid(pipes: &Vec<(u32, u32)>) {
-//     let max_x = pipes.iter().max_by(|(x1, _), (x2, _)| x1.cmp(x2)).unwrap().0;
-//     let max_y = pipes.iter().max_by(|(_, y1), (_, y2)| y1.cmp(y2)).unwrap().1;
-//
-//     for y in 0..=max_y {
-//         for x in 0..=max_x {
-//             if pipes.contains(&(x, y)) {
-//                 print!("#");
-//             } else {
-//                 print!(".");
-//             }
-//         }
-//         println!();
-//     }
-// }
-
-// NOTE: only works if pipes are in order
-fn expand_pipes(pipes: &Vec<(u32, u32)>) -> Vec<(u32, u32)> {
-    let mut expanded = Vec::new();
-    let mut new_grid = pipes.clone();
-    new_grid.push(pipes[0]);
-
-    for window in new_grid.windows(2) {
-        let (curr, next) = (window[0], window[1]);
-        expanded.push((curr.0 * 2, curr.1 * 2));
-
-        // Add half way point
-        expanded.push((
-            (curr.0 as i32 * 2 + (next.0 as i32 - curr.0 as i32)) as u32,
-            (curr.1 as i32 * 2 + (next.1 as i32 - curr.1 as i32)) as u32,
-        ));
-    }
-
-    expanded
+#[derive(Debug, Clone)]
+struct LineSegment {
+    start: (u32, u32),
+    end: (u32, u32),
 }
 
-fn get_inside_point(expanded_pipes: &Vec<(u32, u32)>) -> (u32, u32) {
-    let max_x = expanded_pipes
-        .iter()
-        .max_by(|(x1, _), (x2, _)| x1.cmp(x2))
-        .unwrap()
-        .0;
-    let max_y = expanded_pipes
-        .iter()
-        .max_by(|(_, y1), (_, y2)| y1.cmp(y2))
-        .unwrap()
-        .1;
+fn get_vertical_line_segments(pipes: &Vec<(u32, u32)>) -> Vec<LineSegment> {
+    let mut segments = Vec::new();
+    let mut start = pipes[0];
 
-    for y in 0..max_y {
-        for window in (0..max_x).collect::<Vec<_>>().windows(3) {
-            let (before, current, after) = (window[0], window[1], window[2]);
-            if expanded_pipes.contains(&(current, y)) {
-                if !expanded_pipes.contains(&(before, y)) && !expanded_pipes.contains(&(after, y)) {
-                    return (after, y);
-                } else {
-                    // We have found a wall, but it also has a wall next to it, so we don't want to
-                    // keep searching this row as we won't know if the next is inside or out
-                    break;
-                }
+    // Start at pipes[1], go up and loop back to pipes[0] at end to close loop
+    let pipes_closed = pipes.iter().enumerate().cycle().skip(1).take(pipes.len());
+
+    for (i, pipe) in pipes_closed {
+        if start.0 != pipe.0 {
+            // x changed, check if end of vertical segment
+            let prev = pipes[(i + pipes.len() - 1) % pipes.len()];
+            if start != prev {
+                let min_y = u32::min(start.1, prev.1);
+                let max_y = u32::max(start.1, prev.1);
+                segments.push(LineSegment {
+                    start: (start.0, min_y),
+                    end: (start.0, max_y),
+                });
             }
+            start = *pipe;
         }
     }
 
-    panic!("Inside not found");
+    segments.into_iter().collect()
 }
 
-fn get_num_inside(pipes: &Vec<(u32, u32)>) -> u32 {
-    // "zoom in" on grid - multiply positions by 2, connect pipes
-    // Then flood fill on inside (start), and count up points that land on original grid.
-    // This is all the points that have an even x and y value
-    let expanded = expand_pipes(pipes);
-    let start = get_inside_point(&expanded);
-    let expanded_set: HashSet<(u32, u32)> = HashSet::from_iter(expanded);
+// TODO: allow any order, check perpendicular
+fn intersects(vertical: &LineSegment, horizontal: &LineSegment) -> bool {
+    assert_eq!(vertical.start.0, vertical.end.0);
+    assert_eq!(horizontal.start.1, horizontal.end.1);
 
-    let mut explored = HashSet::new();
-    let mut frontier = vec![start];
-    while !frontier.is_empty() {
-        let curr = frontier.pop().unwrap();
-        if explored.contains(&curr) {
-            continue;
-        }
+    // We have sorted segments earlier so start is always smaller than end
+    let min_y = vertical.start.1;
+    let max_y = vertical.end.1;
 
-        explored.insert(curr);
+    let min_x = horizontal.start.0;
+    let max_x = horizontal.end.0;
 
-        let next = DIRECTIONS
-            .map(|(dx, dy)| ((curr.0 as i32 + dx) as u32, (curr.1 as i32 + dy) as u32))
-            .into_iter()
-            .filter(|pos| !expanded_set.contains(pos));
-
-        frontier.append(&mut next.collect());
-    }
-
-    explored
-        .into_iter()
-        .filter(|(x, y)| x % 2 == 0 && y % 2 == 0)
-        .count() as u32
+    vertical.start.0 < max_x
+        && vertical.start.0 >= min_x
+        && horizontal.start.1 < max_y
+        && horizontal.start.1 >= min_y
 }
 
-fn process(input: &str) -> u32 {
-    let (start, grid) = parse_input(input);
+fn get_pipe_positions(start: (u32, u32), grid: &Vec<Vec<Pipe>>) -> Vec<(u32, u32)> {
     let mut curr = start;
     let mut pipe_positions = vec![curr];
 
-    // Prev only needed to know which way we came from. We can go any direction at start, so just
-    // put (0, 0)
+    // Prev only needs to know which way we came from. Can go any direction at start, so use (0, 0)
     let mut next = get_next((0, 0), start, &grid);
 
     while next != start {
@@ -123,7 +74,63 @@ fn process(input: &str) -> u32 {
         next = new_next;
     }
 
-    get_num_inside(&pipe_positions)
+    pipe_positions
+}
+
+fn get_inside_count(
+    line_segments: &Vec<LineSegment>,
+    pipe_positions: &HashSet<(u32, u32)>,
+    grid_size: (u32, u32),
+) -> u32 {
+    let mut inside_count = 0;
+
+    // TODO: flood fill each "empty" cell, keep record of one cell inside and count, then just do a
+    // check for each of those groups
+
+    // Loop through all coords
+    for (j, i) in (0..grid_size.0).cartesian_product(0..grid_size.1) {
+        // Skip any that are on a pipe
+        if pipe_positions.contains(&(i, j)) {
+            continue;
+        }
+
+        let start = (0, j);
+        let end = (i, j);
+        let segment = LineSegment { start, end };
+
+        // Check how many times line segment from edge to this position intersects a pipe
+        let intersections = line_segments
+            .iter()
+            .filter(|s| intersects(s, &segment))
+            .count();
+
+        // If the number of intersections is odd, we are inside the pipe loop
+        if intersections % 2 == 1 {
+            inside_count += 1;
+        }
+    }
+
+    inside_count
+}
+
+fn process(input: &str) -> u32 {
+    let (start, grid) = parse_input(input);
+
+    // Get list of positions that represent the pipe
+    let pipe_positions = get_pipe_positions(start, &grid);
+
+    // Get vertical line segments of pipe (we only care about vertical as we only check horizontal
+    // line intersecting vertical pipes to see if a point is inside or out)
+    let line_segments = get_vertical_line_segments(&pipe_positions);
+
+    // Convert to hashset for lookup efficiency
+    let pipe_positions: HashSet<(u32, u32)> = HashSet::from_iter(pipe_positions);
+
+    get_inside_count(
+        &line_segments,
+        &pipe_positions,
+        (grid.len() as u32, grid[0].len() as u32),
+    )
 }
 
 #[cfg(test)]
