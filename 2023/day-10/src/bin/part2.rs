@@ -64,12 +64,12 @@ fn get_pipe_positions(start: (u32, u32), grid: &Vec<Vec<Pipe>>) -> Vec<(u32, u32
     let mut pipe_positions = vec![curr];
 
     // Prev only needs to know which way we came from. Can go any direction at start, so use (0, 0)
-    let mut next = get_next((0, 0), start, &grid);
+    let mut next = get_next((0, 0), start, grid);
 
     while next != start {
         pipe_positions.push(next);
 
-        let new_next = get_next(curr, next, &grid);
+        let new_next = get_next(curr, next, grid);
         curr = next;
         next = new_next;
     }
@@ -78,7 +78,7 @@ fn get_pipe_positions(start: (u32, u32), grid: &Vec<Vec<Pipe>>) -> Vec<(u32, u32
 }
 
 fn get_inside_count(
-    line_segments: &Vec<LineSegment>,
+    line_segments: &[LineSegment],
     pipe_positions: &HashSet<(u32, u32)>,
     grid_size: (u32, u32),
 ) -> u32 {
