@@ -1,7 +1,6 @@
 use std::{
     collections::{BinaryHeap, HashMap, HashSet},
     rc::Rc,
-    time::Instant,
 };
 
 macro_rules! hashset {
@@ -32,16 +31,14 @@ struct NodeDist {
     node: (i32, i32),
     last_move: (i32, i32),
     heuristic: u32,
-    // prev: (i32, i32),
     dist: u32,
 }
 
 impl std::hash::Hash for NodeDist {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        // Only want hash to depend on node and move, not distance or prev
+        // Only want hash to depend on node and move
         self.node.hash(state);
         self.last_move.hash(state);
-        // self.dist.hash(state);
     }
 }
 
@@ -49,7 +46,6 @@ impl Ord for NodeDist {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
         // Reverse comparison as binary heap will pop highest value
         (other.dist + other.heuristic).cmp(&(self.dist + self.heuristic))
-        // other.dist.cmp(&self.dist)
     }
 }
 
@@ -149,7 +145,6 @@ fn find_shortest_path(grid: &Vec<Vec<u32>>, start: (i32, i32), end: (i32, i32)) 
                         (neighbour.1 - curr.node.1).signum().abs(),
                     ),
                     heuristic: heuristic(neighbour, end),
-                    // prev: curr.node,
                     dist: new_dist,
                 };
 
@@ -169,8 +164,8 @@ fn find_shortest_path(grid: &Vec<Vec<u32>>, start: (i32, i32), end: (i32, i32)) 
                 if replace {
                     let rc = Rc::new(neighbour_node);
                     nodes
-                        .get_mut(&rc.node)
-                        .unwrap_or(&mut HashSet::new())
+                        .entry(rc.node)
+                        .or_insert(HashSet::new())
                         .insert(rc.clone());
 
                     frontier.push(rc.clone());
