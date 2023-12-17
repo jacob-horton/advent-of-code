@@ -17,14 +17,16 @@ pub fn parse_input(input: &str) -> Vec<Vec<u32>> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 struct Node {
     pos: (i32, i32),
-    last_move: (i32, i32),
     heuristic: u32,
     cost_from_start: u32,
+
+    // Last move is either (0,1) or (1,0) meaning horizontal or vertical
+    last_move: (i32, i32),
 }
 
 impl std::hash::Hash for Node {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        // Only want hash to depend on node and move
+        // Only want hash to depend on node and move direction
         self.pos.hash(state);
         self.last_move.hash(state);
     }
@@ -45,7 +47,7 @@ impl PartialOrd for Node {
 
 // NOTE: only works if only x or only y changes, not both
 fn cost_between(grid: &[Vec<u32>], start: (i32, i32), end: (i32, i32)) -> u32 {
-    assert!(start.0 == end.0 || start.1 == end.1);
+    assert!((start.0 == end.0) ^ (start.1 == end.1));
     let mut cost = 0;
 
     let mut x = start.0;
@@ -59,12 +61,16 @@ fn cost_between(grid: &[Vec<u32>], start: (i32, i32), end: (i32, i32)) -> u32 {
     cost
 }
 
-// NOTE: this heuristic actually provides VERY minimal (only a few ms) speed improvements
+// NOTE: this heuristic actually provides VERY minimal (only a few ms) speed improvement
 fn heuristic(start: (i32, i32), end: (i32, i32)) -> u32 {
     // Manhattan distance
     end.0.abs_diff(start.0) + end.1.abs_diff(start.1)
 }
 
+// Essentially an A* algorithm
+// Main difference is because of the min/max run lengths, we have to keep track of the min distance
+// to a node both when entering it horizontally and vertically (as one may have a larger cost to
+// get to it, but lower overall cost until the end)
 pub fn find_shortest_path(
     grid: &Vec<Vec<u32>>,
     start: (i32, i32),
