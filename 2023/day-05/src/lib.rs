@@ -14,14 +14,11 @@ pub struct MappingLine {
 }
 
 #[derive(Debug, Clone)]
-pub struct Mapping<'a> {
-    pub from: &'a str,
-    pub to: &'a str,
-
+pub struct Mapping {
     pub mappings: Vec<MappingLine>,
 }
 
-impl<'a> Mapping<'a> {
+impl Mapping {
     pub fn map_value(&self, num: u64) -> u64 {
         for mapping in &self.mappings {
             if num >= mapping.source_start && num < mapping.source_start + mapping.range_length {
@@ -72,10 +69,10 @@ fn parse_mapping_line(input: &str) -> IResult<&str, MappingLine> {
 }
 
 fn parse_mapping(input: &str) -> IResult<&str, Mapping> {
-    let (input, (from, to)) = parse_mapping_first_line(input)?;
+    let (input, _) = parse_mapping_first_line(input)?;
     let (input, mappings) = separated_list0(newline, parse_mapping_line)(input)?;
 
-    Ok((input, Mapping { from, to, mappings }))
+    Ok((input, Mapping { mappings }))
 }
 
 pub fn parse_input(input: &str) -> (Vec<u64>, Vec<Mapping>) {
