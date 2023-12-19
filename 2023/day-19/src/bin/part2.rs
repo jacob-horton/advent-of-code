@@ -22,18 +22,19 @@ fn get_accepted(
     workflows: &HashMap<String, Workflow>,
     start: &str,
     mut ranges: HashMap<char, Range>,
-) -> Vec<HashMap<char, Range>> {
+) -> u64 {
     if start == "A" {
-        return vec![ranges];
+        return get_num_combinations(&ranges);
     }
 
     if start == "R" {
-        return Vec::new();
+        return 0;
     }
 
     let workflow = workflows.get(start).unwrap();
 
-    let mut accepted = Vec::new();
+    // NOTE: this only works when there are no overlaps of combinations
+    let mut accepted = 0;
     for rule in &workflow.rules {
         match &rule.condition {
             Some(c) => {
@@ -56,7 +57,7 @@ fn get_accepted(
                 }
 
                 new_ranges.insert(c.property, new_range.clone());
-                accepted.extend(get_accepted(workflows, &rule.workflow, new_ranges));
+                accepted += get_accepted(workflows, &rule.workflow, new_ranges);
 
                 // Reduce range for next rule
                 if new_range.min != range.min {
@@ -65,7 +66,7 @@ fn get_accepted(
                     range.min = new_range.max;
                 }
             }
-            None => accepted.extend(get_accepted(workflows, &rule.workflow, ranges.clone())),
+            None => accepted += get_accepted(workflows, &rule.workflow, ranges.clone()),
         }
     }
 
@@ -85,8 +86,7 @@ fn process(input: &str) -> u64 {
             .collect(),
     );
 
-    // NOTE: this only works when there are no overlaps of combinations
-    accepted.into_iter().map(|r| get_num_combinations(&r)).sum()
+    accepted
 }
 
 #[cfg(test)]
