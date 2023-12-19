@@ -33,7 +33,6 @@ fn get_accepted(
 
     let workflow = workflows.get(start).unwrap();
 
-    // NOTE: this only works when there are no overlaps of combinations
     let mut accepted = 0;
     for rule in &workflow.rules {
         match &rule.condition {
