@@ -1,3 +1,5 @@
+use num::integer::Roots;
+
 fn main() {
     let input = include_str!("../inputs/input.txt");
     let result = process(input);
@@ -19,6 +21,7 @@ fn parse_line(line: &str) -> u64 {
 }
 
 // Binary search to find the first hold_time that goes further than `distance`
+#[allow(dead_code)]
 fn find_first_further(time: u64, distance: u64) -> u64 {
     // Somewhere between start and centre, so start in the middle of those
     let mut start = 0;
@@ -36,6 +39,17 @@ fn find_first_further(time: u64, distance: u64) -> u64 {
     }
 
     curr + 1
+}
+
+fn find_first_further_quadratic(time: u64, distance: u64) -> u64 {
+    // T = total time
+    // t = time holding
+    // d = distance
+    // (T - t) * t > d
+    // Roots: t = (T +/-sqrt(T^2 - 4*d))/2
+
+    // Use quadratic formula to work out first root
+    (time - (time.pow(2) - 4 * distance).sqrt()) / 2 + 1
 }
 
 fn process(input: &str) -> u64 {
@@ -61,7 +75,7 @@ fn process(input: &str) -> u64 {
     // we know the last point at which we go further (time - first_further).
     // Then we can do a subtraction to find the number of different times
     // in-between. And off by one as we need to include the last hold_time
-    let first_further = find_first_further(time, distance);
+    let first_further = find_first_further_quadratic(time, distance);
     (time - first_further) - first_further + 1
 }
 
