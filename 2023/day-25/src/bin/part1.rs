@@ -176,32 +176,22 @@ fn disconnect_wires(mut graph: Graph, n: i32) -> Graph {
     graph
 }
 
-fn get_sections(disconnected_graph: &Graph) -> (HashSet<String>, HashSet<String>) {
+fn get_section_sizes(disconnected_graph: &Graph) -> (u32, u32) {
     let random = disconnected_graph.keys().next().unwrap();
-    let half1 = get_connected_nodes(&disconnected_graph, random);
+    let one_section = get_connected_nodes(&disconnected_graph, random);
 
-    // Find node not in the first half
-    let mut other_node = None;
-    for node in disconnected_graph.keys() {
-        if !half1.contains(node) {
-            other_node = Some(node);
-        }
-    }
-
-    let half2 = get_connected_nodes(
-        &disconnected_graph,
-        other_node.expect("Couldn't find other half"),
-    );
-
-    (half1, half2)
+    (
+        one_section.len() as u32,
+        disconnected_graph.len() as u32 - one_section.len() as u32,
+    )
 }
 
 fn process(input: &str) -> u32 {
     let graph = get_graph(input);
     let disconnected_graph = disconnect_wires(graph, 3);
-    let (half1, half2) = get_sections(&disconnected_graph);
+    let (half1, half2) = get_section_sizes(&disconnected_graph);
 
-    (half1.len() * half2.len()) as u32
+    half1 * half2
 }
 
 #[cfg(test)]
