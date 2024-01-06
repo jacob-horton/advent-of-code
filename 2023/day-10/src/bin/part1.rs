@@ -12,7 +12,7 @@ fn process(input: &str) -> u32 {
     let mut curr_1 = start;
     let mut curr_2 = start;
 
-    // NOTE: doesn't work if start.x == 0
+    // NOTE: doesn't work if start.x is at the far edge of the grid
     let mut next_1 = get_next((start.0 + 1, start.1), start, &grid);
     let mut next_2 = get_next(next_1, start, &grid);
 
