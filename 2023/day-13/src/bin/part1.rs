@@ -12,7 +12,6 @@ fn process(input: &str) -> u32 {
     let mut horiz_mirrors = 0u32;
     let mut vert_mirrors = 0u32;
     for pattern in &patterns {
-        // NOTE: this does not check the smudges are in the same position
         for i in 1..pattern.vertical.len() {
             if does_reflect(&pattern.vertical, i as u32, 0, true) {
                 vert_mirrors += i as u32;

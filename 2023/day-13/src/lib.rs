@@ -18,13 +18,13 @@ pub fn does_reflect(pattern: &[u32], mirror: u32, smudges: u32, smudges_exact: b
         .rev()
         .zip(&pattern[mirror as usize..])
     {
-        if l != r {
+        let diff = (l ^ r).count_ones() as i32;
+        if diff != 0 {
             if smudges_left <= 0 {
                 return false;
             }
 
-            // 1 cell different (smudge)
-            let diff = (l ^ r).count_ones() as i32;
+            // Some cells are different (smudges)
             if diff <= smudges_left {
                 smudges_left -= diff;
             } else {
