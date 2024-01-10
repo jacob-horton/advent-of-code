@@ -80,7 +80,7 @@ pub fn get_energised_tiles(grid: &Vec<Vec<Tile>>, starting_beam: Beam) -> u32 {
                     while !out_of_bounds(next_pos, width, height)
                         && grid[next_pos.1 as usize][next_pos.0 as usize] == Tile::Empty
                     {
-                        beam.pos = add(beam.pos, beam.dir);
+                        beam.pos = next_pos;
                         next_pos = add(beam.pos, beam.dir);
 
                         previous_beam_positions.insert(beam.clone());

@@ -111,7 +111,7 @@ fn process(input: &str) -> u32 {
         }
     }
 
-    // Check which ones can be disintegrated
+    // Check the bricks each brick supports
     let mut supporting: Vec<Vec<usize>> = Vec::new();
 
     bricks.sort_by(|b1, b2| b1.min_z().cmp(&b2.min_z()));

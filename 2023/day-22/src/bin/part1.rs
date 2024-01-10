@@ -92,7 +92,7 @@ fn process(input: &str) -> u32 {
         }
     }
 
-    // Check which ones can be disintegrated
+    // Check the bricks each brick supports
     let mut supporting: Vec<Vec<usize>> = Vec::new();
 
     bricks.sort_by(|b1, b2| b1.min_z().cmp(&b2.min_z()));
@@ -111,6 +111,7 @@ fn process(input: &str) -> u32 {
     // TODO: deal with top better
     supporting.push(Vec::new());
 
+    // Check which ones can be disintegrated
     let mut bricks_to_disintegrate = HashSet::new();
     for (i, s) in supporting.iter().enumerate() {
         // If all supporting have another support, add i to bricks to disintegrate
