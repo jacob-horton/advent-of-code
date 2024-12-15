@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
 
     // Build exe
     const exe = b.addExecutable(.{
-        .name = "bytecode-vm",
+        .name = "day-01",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
@@ -36,7 +36,7 @@ pub fn build(b: *std.Build) void {
 
     // Check step (for LSP)
     const exe_check = b.addExecutable(.{
-        .name = "bytecode-vm",
+        .name = "day-01",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
